@@ -13,7 +13,7 @@ router.get("/:id", async (req, res, next) => {
   if (!id) {
     return res
       .status(404)
-      .json({ message: "Please provide a valid ID number." });
+      .json({ message: "Please provide a valid user ID number." });
   }
 
   try {
@@ -75,14 +75,16 @@ router.post("/follow", authMiddleware, async (req, res, next) => {
   if (!followingUserId || !userId) {
     return res
       .status(404)
-      .json({ message: "User with that ID doesn't exist." });
+      .json({
+        message: "No valid ID provided for current user or user to follow.",
+      });
   }
 
   try {
     const newFollowId = await FollowingUser.create({ userId, followingUserId });
 
     if (!newFollowId) {
-      return res.status(404).json({ message: "No user found." });
+      return res.status(404).json({ message: "User not found." });
     }
 
     res.json(newFollowId);
