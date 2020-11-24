@@ -16,28 +16,32 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      shortDescription: {
+      imageUrl: {
         type: Sequelize.STRING,
+        allowNull: false,
+      },
+      shortDescription: {
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       description: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       shortLight: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       light: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       shortWater: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: false,
       },
       water: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       createdAt: {

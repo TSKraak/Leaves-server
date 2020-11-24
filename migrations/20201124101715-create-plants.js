@@ -15,19 +15,22 @@ module.exports = {
       scientificName: {
         type: Sequelize.STRING,
       },
+      description: {
+        type: Sequelize.TEXT,
+      },
       imageUrl: {
         type: Sequelize.STRING,
       },
       waterPeriodDays: {
         type: Sequelize.INTEGER,
       },
-      vertilisePeriodDays: {
+      fertilisePeriodDays: {
         type: Sequelize.INTEGER,
       },
       waterAlert: {
         type: Sequelize.DATEONLY,
       },
-      vertiliseAlert: {
+      fertiliseAlert: {
         type: Sequelize.DATEONLY,
       },
       userId: {
