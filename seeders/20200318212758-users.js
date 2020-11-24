@@ -40,6 +40,28 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
         },
+        {
+          firstName: "Stephanie",
+          lastName: "Bergman",
+          email: "s@b.com",
+          password: bcrypt.hashSync("apple", SALT_ROUNDS),
+          city: "Amsterdam",
+          country: "Netherlands",
+          accountBlocked: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          firstName: "Igor",
+          lastName: "Sijlbing",
+          email: "i@s.com",
+          password: bcrypt.hashSync("roti", SALT_ROUNDS),
+          city: "Amsterdam",
+          country: "Netherlands",
+          accountBlocked: false,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
       ],
       {}
     );

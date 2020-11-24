@@ -9,7 +9,16 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // user.hasMany(models.reservation);
+      user.belongsToMany(models.user, {
+        as: "following",
+        through: "followingUsers",
+        foreignKey: "userId",
+      }),
+        user.belongsToMany(models.user, {
+          as: "follower",
+          through: "followingUsers",
+          foreignKey: "followingUserId",
+        });
     }
   }
   user.init(
