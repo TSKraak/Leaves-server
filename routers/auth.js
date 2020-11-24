@@ -67,58 +67,6 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-router.get("/users", authMiddleware, async (req, res, next) => {
-  const userIsAdmin = req.user.isAdmin;
-
-  if (!userIsAdmin) {
-    return res.status(401).json({ message: "You are not authorized." });
-  }
-
-  try {
-    const users = await User.findAll({
-      attributes: {
-        exclude: ["password"],
-      },
-    });
-
-    if (!users) {
-      return res.status(404).json({ message: "No users found." });
-    }
-    res.json(users);
-  } catch (e) {
-    console.log("ERROR:", e);
-    next(e);
-  }
-});
-
-router.put("/users", authMiddleware, async (req, res, next) => {
-  const { userId } = req.body;
-  const userIsAdmin = req.user.isAdmin;
-  // console.log("WHAT IS ID???", userId);
-
-  if (!userIsAdmin) {
-    return res.status(401).json({ message: "You are not authorized." });
-  }
-
-  try {
-    const blockedUser = await User.findByPk(userId);
-    if (!blockedUser) {
-      return res.status(404).json({ message: "User not found." });
-    }
-
-    const toggleBlocked = blockedUser.accountBlocked ? false : true;
-
-    const changeUser = await blockedUser.update({
-      accountBlocked: toggleBlocked,
-    });
-
-    res.json(changeUser);
-  } catch (e) {
-    console.log("ERROR:", e);
-    next(e);
-  }
-});
-
 // The /me endpoint can be used to:
 // - get the user info using only their token
 // - checking if a token is (still) valid
