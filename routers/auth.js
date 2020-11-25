@@ -37,11 +37,11 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const { email, password, name } = req.body;
-  if (!email || !password || !name) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return res
       .status(400)
-      .send({ message: "Please provide an email, password and a name" });
+      .send({ message: "Please provide an email and password" });
   }
 
   try {
