@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       user.hasMany(models.plant);
+      user.hasMany(models.comment);
 
       user.belongsToMany(models.user, {
         as: "following",
@@ -50,6 +51,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      imageUrl: DataTypes.STRING,
       accountBlocked: {
         type: DataTypes.STRING,
         defaultValue: false,
