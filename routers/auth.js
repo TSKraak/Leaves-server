@@ -37,7 +37,15 @@ router.post("/login", async (req, res, next) => {
 });
 
 router.post("/signup", async (req, res) => {
-  const { email, password } = req.body;
+  const {
+    firstName,
+    lastName,
+    city,
+    country,
+    imageUrl,
+    email,
+    password,
+  } = req.body;
   if (!email || !password) {
     return res
       .status(400)
@@ -46,14 +54,18 @@ router.post("/signup", async (req, res) => {
 
   try {
     const newUser = await User.create({
+      firstName,
+      lastName,
+      city,
+      country,
+      imageUrl,
       email,
       password: bcrypt.hashSync(password, SALT_ROUNDS),
-      name,
     });
 
     delete newUser.dataValues["password"]; // don't send back the password hash
 
-    const token = toJWT({ userId: newUser.id, isAdmin: user.isAdmin });
+    const token = toJWT({ userId: newUser.id });
 
     res.status(201).json({ token, ...newUser.dataValues });
   } catch (error) {
