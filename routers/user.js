@@ -35,12 +35,12 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-router.patch("/:id", authMiddleware, async (req, res, next) => {
-  const { id } = req.params;
+router.patch("/", authMiddleware, async (req, res, next) => {
+  const { id } = req.user;
   const { firstName, lastName, email, password, city, country } = req.body;
 
-  if (req.user.id !== parseInt(id)) {
-    return res.status(401).json({ message: "You're not authorized." });
+  if (!id) {
+    return res.status(401).json({ message: "User not found." });
   }
 
   try {
@@ -63,8 +63,36 @@ router.patch("/:id", authMiddleware, async (req, res, next) => {
 
     res.json(updatedUser);
   } catch (e) {
+    return res.status(400).send({ message: "Something went wrong, sorry" });
+  }
+});
+
+router.patch("/password", authMiddleware, async (req, res, next) => {
+  const { id } = req.user;
+  const { password } = req.body;
+
+  if (!id) {
+    return res.status(401).json({ message: "User not found." });
+  }
+
+  try {
+    const userToUpdate = await User.findByPk(id);
+
+    if (!userToUpdate) {
+      return res.status(404).json({ message: "No user found." });
+    }
+
+    const updatedUser = await userToUpdate.update({
+      password: bcrypt.hashSync(password, SALT_ROUNDS),
+    });
+
+    delete updatedUser.dataValues["password"]; // don't send back the password hash
+
+    res.status(200).send({ message: "Password updated." });
+  } catch (e) {
     console.log("ERROR:", e);
     next(e);
+    return res.status(400).send({ message: "Something went wrong, sorry" });
   }
 });
 
@@ -73,11 +101,9 @@ router.post("/follow", authMiddleware, async (req, res, next) => {
   const userId = req.user.id;
 
   if (!followingUserId || !userId) {
-    return res
-      .status(404)
-      .json({
-        message: "No valid ID provided for current user or user to follow.",
-      });
+    return res.status(404).json({
+      message: "No valid ID provided for current user or user to follow.",
+    });
   }
 
   try {
