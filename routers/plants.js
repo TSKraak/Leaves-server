@@ -16,6 +16,32 @@ router.get("/suggestions", async (req, res, next) => {
     res.json(plants);
   } catch (e) {
     console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
+    next(e);
+  }
+});
+
+router.get("/suggestions/:id", async (req, res, next) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res
+      .status(404)
+      .json({ message: "Please provide a valid plant ID number." });
+  }
+
+  try {
+    const plant = await PlantSuggestions.findByPk(id);
+
+    if (!plant) {
+      return res
+        .status(404)
+        .json({ message: "Plant with that ID doesn't exist." });
+    }
+    res.json(plant);
+  } catch (e) {
+    console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
     next(e);
   }
 });
@@ -31,6 +57,7 @@ router.get("/", async (req, res, next) => {
     res.json(plants);
   } catch (e) {
     console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
     next(e);
   }
 });
@@ -55,6 +82,7 @@ router.get("/:id", async (req, res, next) => {
     res.json(plant);
   } catch (e) {
     console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
     next(e);
   }
 });
@@ -82,6 +110,7 @@ router.get("/user/:id", async (req, res, next) => {
     res.json(plants);
   } catch (e) {
     console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
     next(e);
   }
 });
@@ -121,6 +150,7 @@ router.get("/following", authMiddleware, async (req, res, next) => {
     res.json(plants);
   } catch (e) {
     console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
     next(e);
   }
 });
@@ -166,6 +196,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
     res.json(newPlant);
   } catch (e) {
     console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
     next(e);
   }
 });
@@ -208,6 +239,7 @@ router.patch("/:id", authMiddleware, async (req, res, next) => {
     res.json(updatedPlant);
   } catch (e) {
     console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
     next(e);
   }
 });
