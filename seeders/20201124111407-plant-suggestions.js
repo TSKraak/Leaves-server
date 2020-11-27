@@ -333,7 +333,8 @@ module.exports = {
         {
           name: "Chenille Plant",
           scientificName: "Acalypha hispida",
-          imageUrl: "",
+          imageUrl:
+            "https://www.plantvine.com/plants/Acalypha-hispida-Large-1.jpg",
           shortDescription:
             "It's hard to resist touching the fuzzy catkins of the Acalypha hispida. Chenille plants are fun specimens for the annual container garden, but they also take well to indoor culture, provided you have bright south or east-facing window for them to gain the energy to produce their year-round blooms. Chenille plants also like lots of water and nutrients, and you can kill two birds with one stone by irrigating them with compost tea. ",
           description:
