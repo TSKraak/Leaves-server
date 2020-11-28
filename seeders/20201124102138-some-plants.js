@@ -48,7 +48,7 @@ module.exports = {
           updatedAt: new Date(),
         },
         {
-          name: "Paradise",
+          name: "Dragon shine",
           scientificName: "Dracaena Marginata",
           description: "",
           imageUrl:
@@ -100,7 +100,7 @@ module.exports = {
           scientificName: "Calathea White Star",
           description: "",
           imageUrl:
-            "https://cdn.shopify.com/s/files/1/0254/3750/3562/products/ImageServer_287a9f8e-2235-4043-af67-8f6406ae6a2f_2000x.jpg",
+            "https://www.intratuin.nl/media/catalog/product/8/7/8717263109617.jpg",
           waterPeriodDays: 9,
           fertilisePeriodDays: 27,
           waterAlert: "2020/12/01",

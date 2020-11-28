@@ -48,7 +48,7 @@ router.get("/suggestions/:id", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    const plants = await Plant.findAll();
+    const plants = await Plant.findAll({ include: [{ model: User }] });
 
     if (!plants) {
       return res.status(404).json({ message: "Sorry. No plants found." });
@@ -62,7 +62,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-router.get("/:id", async (req, res, next) => {
+router.get("/plant/:id", async (req, res, next) => {
   const { id } = req.params;
 
   if (!id) {
@@ -125,6 +125,24 @@ router.get("/following", authMiddleware, async (req, res, next) => {
   }
 
   try {
+    // const plants = await Plant.findAll({
+    //   include: [
+    //     {
+    //       model: User,
+    //       attributes: { exclude: ["password"] },
+    //       include: [
+    //         {
+    //           model: User,
+    //           attributes: {
+    //             exclude: ["password"],
+    //           },
+    //           as: "following",
+    //           where: { attributes: { ["userId"] } },
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // });
     const plants = await User.findByPk(id, {
       attributes: {
         exclude: ["password"],
@@ -201,7 +219,7 @@ router.post("/", authMiddleware, async (req, res, next) => {
   }
 });
 
-router.patch("/:id", authMiddleware, async (req, res, next) => {
+router.patch("/plant/:id", authMiddleware, async (req, res, next) => {
   const { id } = req.params;
   const {
     name,
