@@ -32,6 +32,7 @@ router.get("/:id", async (req, res, next) => {
   } catch (e) {
     console.log("ERROR:", e);
     next(e);
+    return res.status(400).send({ message: "Something went wrong, sorry" });
   }
 });
 
@@ -117,7 +118,49 @@ router.post("/follow", authMiddleware, async (req, res, next) => {
   } catch (e) {
     console.log("ERROR:", e);
     next(e);
+    return res.status(400).send({ message: "Something went wrong, sorry" });
   }
 });
+
+router.delete(
+  "/follow/:followingUserId",
+  authMiddleware,
+  async (req, res, next) => {
+    const { followingUserId } = req.params;
+    const userId = req.user.id;
+
+    console.log("followingUserId", followingUserId);
+    console.log("userId", userId);
+
+    if (!followingUserId || !userId) {
+      return res.status(404).json({
+        message: "No valid ID provided for current user or user to unfollow.",
+      });
+    }
+
+    try {
+      const unfollowUser = await FollowingUser.findOne({
+        where: {
+          userId,
+          followingUserId,
+        },
+      });
+
+      if (!unfollowUser) {
+        return res
+          .status(404)
+          .json({ message: "You're not following this user." });
+      }
+
+      const removeFollow = await unfollowUser.destroy();
+
+      res.json(removeFollow);
+    } catch (e) {
+      console.log("ERROR:", e);
+      next(e);
+      return res.status(400).send({ message: "Something went wrong, sorry" });
+    }
+  }
+);
 
 module.exports = router;
