@@ -35,11 +35,11 @@ router.get("/:plantId", async (req, res, next) => {
 // });
 
 router.post("/:plantId", authMiddleware, async (req, res, next) => {
-  const { comment } = req.body;
+  const { text } = req.body;
   const { plantId } = req.params;
   const userId = req.user.id;
 
-  if (!comment | !plantId | !userId) {
+  if (!text | !plantId | !userId) {
     return res.status(400).json({
       message: "Please provide a comment, valid plant ID and user ID.",
     });
@@ -47,7 +47,7 @@ router.post("/:plantId", authMiddleware, async (req, res, next) => {
 
   try {
     const newComment = await Comment.create({
-      comment,
+      text,
       userId,
       plantId,
     });
@@ -58,7 +58,13 @@ router.post("/:plantId", authMiddleware, async (req, res, next) => {
         .json({ message: "Something went wrong.. Please try again." });
     }
 
-    res.json(newComment);
+    const returnComment = await Comment.findByPk(newComment.id, {
+      include: [
+        { model: User, attributes: ["firstName", "lastName", "imageUrl"] },
+      ],
+    });
+
+    res.json(returnComment);
   } catch (e) {
     console.log("ERROR:", e);
     next(e);
@@ -67,7 +73,7 @@ router.post("/:plantId", authMiddleware, async (req, res, next) => {
 
 router.patch("/:id", authMiddleware, async (req, res, next) => {
   const { id } = req.params;
-  const { comment } = req.body;
+  const { text } = req.body;
 
   try {
     const commentToUpdate = await Comment.findByPk(id);
@@ -82,7 +88,7 @@ router.patch("/:id", authMiddleware, async (req, res, next) => {
       return res.status(404).json({ message: "Comment not found." });
     }
     const updatedComment = await commentToUpdate.update({
-      comment,
+      text,
     });
 
     res.json(updatedComment);

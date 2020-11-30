@@ -3,6 +3,7 @@ const authMiddleware = require("../auth/middleware");
 const PlantSuggestions = require("../models/").plantSuggestions;
 const Plant = require("../models/").plant;
 const User = require("../models/").user;
+const Comment = require("../models/").comment;
 
 const router = new Router();
 
@@ -48,7 +49,16 @@ router.get("/suggestions/:id", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    const plants = await Plant.findAll({ include: [{ model: User }] });
+    const plants = await Plant.findAll({
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+      ],
+    });
 
     if (!plants) {
       return res.status(404).json({ message: "Sorry. No plants found." });
@@ -72,7 +82,22 @@ router.get("/plant/:id", async (req, res, next) => {
   }
 
   try {
-    const plant = await Plant.findByPk(id);
+    const plant = await Plant.findByPk(id, {
+      include: [
+        {
+          model: User,
+          attributes: {
+            exclude: ["password"],
+          },
+        },
+        {
+          model: Comment,
+          include: [
+            { model: User, attributes: ["firstName", "lastName", "imageUrl"] },
+          ],
+        },
+      ],
+    });
 
     if (!plant) {
       return res
@@ -97,10 +122,7 @@ router.get("/user/:id", async (req, res, next) => {
   }
 
   try {
-    const plants = await User.findByPk(id, {
-      attributes: { exclude: ["password"] },
-      include: [{ model: Plant }],
-    });
+    const plants = await Plant.findAll({ where: { userId: id } });
 
     if (!plants) {
       return res
@@ -125,24 +147,6 @@ router.get("/following", authMiddleware, async (req, res, next) => {
   }
 
   try {
-    // const plants = await Plant.findAll({
-    //   include: [
-    //     {
-    //       model: User,
-    //       attributes: { exclude: ["password"] },
-    //       include: [
-    //         {
-    //           model: User,
-    //           attributes: {
-    //             exclude: ["password"],
-    //           },
-    //           as: "following",
-    //           where: { attributes: { ["userId"] } },
-    //         },
-    //       ],
-    //     },
-    //   ],
-    // });
     const plants = await User.findByPk(id, {
       attributes: {
         exclude: ["password"],
@@ -205,13 +209,23 @@ router.post("/", authMiddleware, async (req, res, next) => {
       userId,
     });
 
+    const returnPlant = await Plant.findByPk(newPlant.id, {
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName", "id"],
+        },
+        { model: Comment },
+      ],
+    });
+
     if (!newPlant) {
       return res
         .status(404)
         .json({ message: "Something went wrong.. Please try again." });
     }
 
-    res.json(newPlant);
+    res.json(returnPlant);
   } catch (e) {
     console.log("ERROR:", e);
     res.status(404).json({ message: "Something went wrong, sorry" });
