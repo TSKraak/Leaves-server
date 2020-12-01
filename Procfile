@@ -1,1 +1,1 @@
-release: npm run resetDB
+release: bash post-release.sh
