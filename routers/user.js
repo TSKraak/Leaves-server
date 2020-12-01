@@ -38,7 +38,7 @@ router.get("/:id", async (req, res, next) => {
 
 router.patch("/", authMiddleware, async (req, res, next) => {
   const { id } = req.user;
-  const { firstName, lastName, email, password, city, country } = req.body;
+  const { firstName, lastName, email, city, country } = req.body;
 
   if (!id) {
     return res.status(401).json({ message: "User not found." });
@@ -55,7 +55,6 @@ router.patch("/", authMiddleware, async (req, res, next) => {
       firstName,
       lastName,
       email,
-      password: bcrypt.hashSync(password, SALT_ROUNDS),
       city,
       country,
     });
