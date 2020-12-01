@@ -7,6 +7,9 @@ const authRouter = require("./routers/auth");
 const userRouter = require("./routers/user");
 const plantsRouter = require("./routers/plants");
 const commentsRouter = require("./routers/comments");
+const Plant = require("./models/").plant;
+const User = require("./models/").user;
+const { mailReminder } = require("./nodemailer");
 
 const app = express();
 
@@ -44,3 +47,73 @@ app.use("/comments", commentsRouter);
 app.listen(PORT, () => {
   console.log(`Listening on port: ${PORT}`);
 });
+
+setInterval(async function waterAlertChecker() {
+  const plants = await Plant.findAll();
+
+  const curr = new Date();
+  curr.setDate(curr.getDate());
+  const newDate = curr.toISOString().substr(0, 10);
+
+  const stringDate = new Date(`${newDate}T10:00:00Z`);
+
+  plants.forEach(async (plant) => {
+    const waterAlert = new Date(`${plant.waterAlert}T10:00:00Z`);
+
+    if (+stringDate >= +waterAlert) {
+      const plantToUpdate = await Plant.findByPk(plant.id, {
+        include: [{ model: User }],
+      });
+
+      waterAlert.setDate(waterAlert.getDate() + plant.waterPeriodDays);
+      const newAlertDate = waterAlert.toISOString().substr(0, 10);
+
+      const updatedPlant = await plantToUpdate.update({
+        waterAlert: newAlertDate,
+      });
+
+      mailReminder({
+        email: plantToUpdate.user.email,
+        careType: "water",
+        plantName: plant.name,
+        nextReminder: updatedPlant.waterAlert,
+      });
+    }
+  });
+}, 21600000); // runs every 6 hours
+
+setInterval(async function fertiliseAlertChecker() {
+  const plants = await Plant.findAll();
+
+  const curr = new Date();
+  curr.setDate(curr.getDate());
+  const newDate = curr.toISOString().substr(0, 10);
+
+  const stringDate = new Date(`${newDate}T10:00:00Z`);
+
+  plants.forEach(async (plant) => {
+    const fertiliseAlert = new Date(`${plant.fertiliseAlert}T10:00:00Z`);
+
+    if (+stringDate >= +fertiliseAlert) {
+      const plantToUpdate = await Plant.findByPk(plant.id, {
+        include: [{ model: User }],
+      });
+
+      fertiliseAlert.setDate(
+        fertiliseAlert.getDate() + plant.fertilisePeriodDays
+      );
+      const newAlertDate = fertiliseAlert.toISOString().substr(0, 10);
+
+      const updatedPlant = await plantToUpdate.update({
+        fertiliseAlert: newAlertDate,
+      });
+
+      mailReminder({
+        email: plantToUpdate.user.email,
+        careType: "fertilise",
+        plantName: plant.name,
+        nextReminder: updatedPlant.fertiliseAlert,
+      });
+    }
+  });
+}, 21600000); // runs every 6 hours
