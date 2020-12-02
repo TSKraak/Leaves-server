@@ -55,7 +55,7 @@ setInterval(async function waterAlertChecker() {
   curr.setDate(curr.getDate());
   const newDate = curr.toISOString().substr(0, 10);
 
-  const stringDate = new Date(`${newDate}`);
+  const stringDate = new Date();
 
   plants.forEach(async (plant) => {
     const waterAlert = new Date(`${plant.waterAlert}T10:00:00Z`);
@@ -65,19 +65,31 @@ setInterval(async function waterAlertChecker() {
         include: [{ model: User }],
       });
 
-      waterAlert.setDate(waterAlert.getDate() + plant.waterPeriodDays);
-      const newAlertDate = waterAlert.toISOString().substr(0, 10);
+      if (!plant.waterPeriodDays) {
+        const updatedPlant = await plantToUpdate.update({
+          waterAlert: null,
+        });
+        return mailReminder({
+          email: plantToUpdate.user.email,
+          careType: "water",
+          plantName: plant.name,
+          nextReminder: updatedPlant.waterAlert,
+        });
+      } else {
+        waterAlert.setDate(waterAlert.getDate() + plant.waterPeriodDays);
+        const newAlertDate = waterAlert.toISOString().substr(0, 10);
 
-      const updatedPlant = await plantToUpdate.update({
-        waterAlert: newAlertDate,
-      });
+        const updatedPlant = await plantToUpdate.update({
+          waterAlert: newAlertDate,
+        });
 
-      mailReminder({
-        email: plantToUpdate.user.email,
-        careType: "water",
-        plantName: plant.name,
-        nextReminder: updatedPlant.waterAlert,
-      });
+        mailReminder({
+          email: plantToUpdate.user.email,
+          careType: "water",
+          plantName: plant.name,
+          nextReminder: updatedPlant.waterAlert,
+        });
+      }
     }
   });
 }, 1200000); // runs every 20 mins so Heroku server won't go to sleep
@@ -89,31 +101,43 @@ setInterval(async function fertiliseAlertChecker() {
   curr.setDate(curr.getDate());
   const newDate = curr.toISOString().substr(0, 10);
 
-  const stringDate = new Date(`${newDate}`);
+  const stringDate = new Date();
 
   plants.forEach(async (plant) => {
     const fertiliseAlert = new Date(`${plant.fertiliseAlert}T10:00:00Z`);
 
-    if (+stringDate >= +fertiliseAlert) {
+    if (+stringDate > +fertiliseAlert) {
       const plantToUpdate = await Plant.findByPk(plant.id, {
         include: [{ model: User }],
       });
 
-      fertiliseAlert.setDate(
-        fertiliseAlert.getDate() + plant.fertilisePeriodDays
-      );
-      const newAlertDate = fertiliseAlert.toISOString().substr(0, 10);
+      if (!plant.fertilisePeriodDays) {
+        const updatedPlant = await plantToUpdate.update({
+          fertiliseAlert: null,
+        });
+        return mailReminder({
+          email: plantToUpdate.user.email,
+          careType: "fertilise",
+          plantName: plant.name,
+          nextReminder: updatedPlant.fertiliseAlert,
+        });
+      } else {
+        fertiliseAlert.setDate(
+          fertiliseAlert.getDate() + plant.fertilisePeriodDays
+        );
+        const newAlertDate = fertiliseAlert.toISOString().substr(0, 10);
 
-      const updatedPlant = await plantToUpdate.update({
-        fertiliseAlert: newAlertDate,
-      });
+        const updatedPlant = await plantToUpdate.update({
+          fertiliseAlert: newAlertDate,
+        });
 
-      mailReminder({
-        email: plantToUpdate.user.email,
-        careType: "fertilise",
-        plantName: plant.name,
-        nextReminder: updatedPlant.fertiliseAlert,
-      });
+        return mailReminder({
+          email: plantToUpdate.user.email,
+          careType: "fertilise",
+          plantName: plant.name,
+          nextReminder: updatedPlant.fertiliseAlert,
+        });
+      }
     }
   });
 }, 1200000); // runs every 20 mins so Heroku server won't go to sleep
