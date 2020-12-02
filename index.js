@@ -55,7 +55,7 @@ setInterval(async function waterAlertChecker() {
   curr.setDate(curr.getDate());
   const newDate = curr.toISOString().substr(0, 10);
 
-  const stringDate = new Date(`${newDate}T10:00:00Z`);
+  const stringDate = new Date(`${newDate}`);
 
   plants.forEach(async (plant) => {
     const waterAlert = new Date(`${plant.waterAlert}T10:00:00Z`);
@@ -80,7 +80,7 @@ setInterval(async function waterAlertChecker() {
       });
     }
   });
-}, 21600000); // runs every 6 hours
+}, 1200000); // runs every 20 mins so Heroku server won't go to sleep
 
 setInterval(async function fertiliseAlertChecker() {
   const plants = await Plant.findAll();
@@ -89,7 +89,7 @@ setInterval(async function fertiliseAlertChecker() {
   curr.setDate(curr.getDate());
   const newDate = curr.toISOString().substr(0, 10);
 
-  const stringDate = new Date(`${newDate}T10:00:00Z`);
+  const stringDate = new Date(`${newDate}`);
 
   plants.forEach(async (plant) => {
     const fertiliseAlert = new Date(`${plant.fertiliseAlert}T10:00:00Z`);
@@ -116,4 +116,4 @@ setInterval(async function fertiliseAlertChecker() {
       });
     }
   });
-}, 21600000); // runs every 6 hours
+}, 1200000); // runs every 20 mins so Heroku server won't go to sleep
