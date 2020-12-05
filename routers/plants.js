@@ -276,4 +276,28 @@ router.patch("/plant/:id", authMiddleware, async (req, res, next) => {
   }
 });
 
+router.delete("/plant/:id", authMiddleware, async (req, res, next) => {
+  const { id } = req.params;
+
+  try {
+    const plantToDelete = await Plant.findByPk(id);
+
+    if (req.user.id !== plantToDelete.userId) {
+      return res.status(401).json({ message: "You're not authorized." });
+    }
+
+    if (!plantToDelete) {
+      return res.status(404).json({ message: "Plant not found." });
+    }
+
+    const deletedPlant = await plantToDelete.destroy();
+
+    res.json(deletedPlant);
+  } catch (e) {
+    console.log("ERROR:", e);
+    res.status(404).json({ message: "Something went wrong, sorry" });
+    next(e);
+  }
+});
+
 module.exports = router;
